@@ -24,6 +24,8 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.storage.Asset;
 
+import java.nio.charset.Charset;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.sonatype.nexus.testsuite.testsupport.FormatClientSupport.status;
@@ -69,7 +71,7 @@ public class ComposerProxyIT
 
     try (CloseableHttpResponse response = proxyClient.get(FILE_PACKAGES)) {
       HttpEntity entity = response.getEntity();
-      JsonElement element = new JsonParser().parse(IOUtils.toString(entity.getContent()));
+      JsonElement element = JsonParser.parseString(IOUtils.toString(entity.getContent(), Charset.defaultCharset()));
       JsonObject json = element.getAsJsonObject();
       assertThat(matchesPattern("http://localhost:[0-9]*/repository/composer-test-proxy/p/%package%.json").matches(json.get("providers-url").getAsString()), is(true));
     }
